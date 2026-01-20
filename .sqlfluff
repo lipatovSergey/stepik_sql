@@ -1,0 +1,7 @@
+  [sqlfluff]
+  dialect = mysql
+
+  [sqlfluff:rules]
+  capitalisation_policy = consistent
+  LT09 = disabled
+  AL03 = disabled
