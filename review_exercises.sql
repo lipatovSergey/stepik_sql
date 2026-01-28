@@ -1,0 +1,493 @@
+-- ============================================
+-- SQL Review Exercises / Упражнения для повторения
+-- ============================================
+-- Database: stepik
+-- Tables: book (book_id, title, author, price, amount)
+--         supply (supply_id, title, author, price, amount)
+-- ============================================
+CREATE TABLE book (
+  book_id INT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(30),
+  author VARCHAR(30),
+  price DECIMAL(8, 2),
+  amount INT
+);
+
+INSERT INTO
+  book (title, author, price, amount)
+VALUES
+  ('Мастер и Маргарита', 'Булгаков М.А.', 670.99, 3),
+  ('Белая гвардия', 'Булгаков М.А.', 540.50, 5),
+  ('Идиот', 'Достоевский Ф.М.', 460.00, 10),
+  (
+    'Братья Карамазовы',
+    'Достоевский Ф.М.',
+    799.01,
+    3
+  ),
+  (
+    'Стихотворения и поэмы',
+    'Есенин С.А.',
+    650.00,
+    15
+  );
+
+SELECT
+  *
+FROM
+  book;
+
+-- ============================================
+-- LEVEL 1: SELECT Basics
+-- ============================================
+-- 1.1 Выбери все книги с ценой больше 500 рублей
+-- Expected: WHERE clause with comparison operator
+-- SELECT
+--   book_id,
+--   title,
+--   author,
+--   price,
+--   amount
+-- FROM
+--   book
+-- WHERE
+--   price > 500;
+--
+-- 1.2 Найди всех уникальных авторов в таблице book
+-- Expected: DISTINCT keyword
+-- SELECT DISTINCT
+--   author
+-- FROM
+--   book;
+--
+-- 1.3 Выведи все книги, отсортированные по цене от дорогих к дешевым
+-- Expected: ORDER BY with DESC
+-- SELECT
+--   book_id,
+--   title,
+--   author,
+--   price,
+--   amount
+-- FROM
+--   book
+-- ORDER BY
+--   price DESC;
+--
+-- 1.4 Найди книги, у которых количество от 5 до 10 включительно
+-- Expected: BETWEEN operator
+-- SELECT
+--   book_id,
+--   title,
+--   author,
+--   price,
+--   amount
+-- FROM
+--   book
+-- WHERE
+--   amount BETWEEN 5 AND 10;
+--
+-- 1.5 Выбери книги Булгакова или Есенина
+-- Expected: IN operator or multiple OR conditions
+-- SELECT
+--   book_id,
+--   title,
+--   author,
+--   price,
+--   amount
+-- FROM
+--   book
+-- WHERE
+--   author IN ('Булгаков М.А.', 'Есенин С.А.');
+--
+-- ============================================
+-- LEVEL 2: Aggregate Functions
+-- ============================================
+-- 2.1 Посчитай общее количество книг на складе (сумма amount)
+-- Expected: SUM() function
+-- SELECT
+--   SUM(amount) AS amount_sum
+-- FROM
+--   book;
+--
+-- 2.2 Найди минимальную и максимальную цену книг
+-- Expected: MIN() and MAX() functions
+-- SELECT
+--   MIN(price) AS min_price,
+--   MAX(price) AS max_price
+-- FROM
+--   book;
+--
+-- 2.3 Посчитай среднюю цену книг, округленную до 2 знаков
+-- Expected: AVG() with ROUND()
+-- SELECT
+--   ROUND(AVG(price), 2) AS average_price
+-- FROM
+--   book;
+--
+-- 2.4 Сколько различных авторов в таблице book?
+-- Expected: COUNT(DISTINCT ...)
+-- SELECT
+--   COUNT(DISTINCT author) AS total_author
+-- FROM
+--   book;
+--
+-- 2.5 Найди общую стоимость всех книг на складе (price * amount)
+-- Expected: SUM() with expression
+-- SELECT
+--   SUM(price * amount) AS total_price
+-- FROM
+--   book;
+--
+-- ============================================
+-- LEVEL 3: GROUP BY & HAVING
+-- ============================================
+-- 3.1 Посчитай количество наименований книг у каждого автора
+-- Expected: COUNT() with GROUP BY
+-- SELECT
+--   author,
+--   COUNT(title) AS title_amount
+-- FROM
+--   book
+-- GROUP BY
+--   author;
+--
+-- 3.2 Найди среднюю цену книг каждого автора
+-- Expected: AVG() with GROUP BY
+-- SELECT
+--   author,
+--   AVG(price) AS average_price
+-- FROM
+--   book
+-- GROUP BY
+--   author;
+--
+-- 3.3 Выведи авторов, у которых суммарное количество книг > 10
+-- Expected: SUM() with GROUP BY and HAVING
+-- SELECT
+--   author,
+--   SUM(amount) AS book_amount
+-- FROM
+--   book
+-- GROUP BY
+--   author
+-- HAVING
+--   SUM(amount) > 10;
+--
+-- 3.4 Найди авторов, у которых средняя цена книг больше 620
+--     Отсортируй по средней цене по убыванию
+-- Expected: AVG(), GROUP BY, HAVING, ORDER BY
+-- SELECT
+--   author,
+--   AVG(price) as average_price
+-- FROM
+--   book
+-- GROUP BY
+--   author
+-- HAVING
+--   AVG(price) > 620
+-- ORDER BY
+--   average_price DESC;
+--
+--
+-- 3.5 Выведи авторов с более чем одной книгой,
+--     показав количество книг и их общую стоимость
+-- Expected: COUNT(), SUM(), GROUP BY, HAVING
+-- SELECT
+--   author,
+--   COUNT(title) AS title_amount,
+--   SUM(price * amount) AS price_sum
+-- FROM
+--   book
+-- GROUP BY
+--   author
+-- HAVING
+--   COUNT(title) > 1;
+--
+-- ============================================
+-- LEVEL 4: Subqueries
+-- ============================================
+-- 4.1 Найди книги с ценой выше средней
+-- Expected: Scalar subquery in WHERE
+-- SELECT
+--   title,
+--   price
+-- FROM
+--   book
+-- WHERE
+--   price > (
+--     SELECT
+--       AVG(price)
+--     FROM
+--       book
+--   );
+--
+-- 4.2 Найди книги с минимальной ценой
+-- Expected: Subquery with MIN()
+-- SELECT
+--   title,
+--   price
+-- FROM
+--   book
+-- WHERE
+--   price = (
+--     SELECT
+--       MIN(price)
+--     FROM
+--       book
+--   );
+--
+-- 4.3 Выбери книги авторов, у которых есть хотя бы одна книга дешевле 300
+-- Expected: IN with subquery
+-- SELECT
+--   title
+-- FROM
+--   book
+-- WHERE
+--   author IN (
+--     SELECT
+--       author
+--     FROM
+--       book
+--     WHERE
+--       price < 550
+--   );
+--
+-- 4.4 Найди книги, цена которых меньше всех книг Булгакова
+-- Expected: ALL operator with subquery
+-- SELECT
+--   title,
+--   price
+-- FROM
+--   book
+-- WHERE
+--   price < ALL (
+--     SELECT
+--       price
+--     FROM
+--       book
+--     WHERE
+--       author = 'Булгаков М.А.'
+--   );
+--
+-- 4.5 Выведи книги с колонкой "отклонение от средней цены"
+-- Expected: Subquery in SELECT clause
+-- SELECT
+--   *,
+--   price - (
+--     SELECT
+--       AVG(price)
+--     FROM
+--       book
+--   ) AS price_deviation
+-- FROM
+--   book;
+--
+-- 4.6 Найди книги, количество которых уникально (встречается только один раз)
+-- Expected: IN with subquery using GROUP BY and HAVING COUNT = 1
+-- SELECT
+--   *
+-- FROM
+--   book
+-- WHERE
+--   amount IN (
+--     SELECT
+--       amount
+--     FROM
+--       book
+--     GROUP BY
+--       amount
+--     HAVING
+--       COUNT(amount) = 1
+--   );
+--
+-- ============================================
+-- LEVEL 5: Data Modification (INSERT, UPDATE, DELETE)
+-- ============================================
+-- 5.1 Вставь новую книгу: 'Война и мир', 'Толстой Л.Н.', 750.00, 3
+-- Expected: Basic INSERT
+-- INSERT INTO
+--   book (title, author, price, amount)
+-- VALUES
+--   ('Война и мир', 'Толстой Л.Н.', 750.00, 3)
+--
+-- 5.2 Увеличь цену всех книг Булгакова на 10%
+-- Expected: UPDATE with WHERE and expression
+-- UPDATE book
+-- SET
+--   price = price * 1.1
+-- WHERE
+--   author = 'Булгаков М.А.'
+--
+-- 5.3 Примени скидку 20% на книги дороже 600 рублей
+-- Expected: UPDATE with WHERE condition
+-- UPDATE book
+-- SET
+--   price = price * 0.8
+-- WHERE
+--   price > 600;
+--
+-- 5.4 Увеличь количество на 5 для книг, у которых amount < 5
+-- Expected: UPDATE with arithmetic expression
+-- UPDATE book
+-- SET
+--   amount = amount + 5
+-- WHERE
+--   amount < 5;
+--
+-- 5.5 Удали книги, которых на складе меньше 4 штук
+-- Expected: DELETE with WHERE
+-- DELETE FROM book
+-- WHERE
+--   amount < 4;
+--
+-- 5.6 (Advanced) Используя IF(), установи скидку:
+--     - 10% если цена > 700
+--     - 5% если цена > 500
+--     - 0% в остальных случаях
+-- Expected: UPDATE with nested IF()
+-- UPDATE book
+-- SET
+--   price = IF (
+--     price > 700,
+--     price * 0.9,
+--     IF (price > 500, price * 0.95, price * 1)
+--   );
+--
+-- ============================================
+-- LEVEL 6: CREATE TABLE AS SELECT
+-- ============================================
+-- 6.1 Создай таблицу expensive_books с книгами дороже 600
+-- Expected: CREATE TABLE AS SELECT with WHERE
+-- CREATE TABLE expensive_books AS
+-- SELECT
+--   *
+-- FROM
+--   book
+-- WHERE
+--   price > 600;
+-- SELECT
+--   *
+-- FROM
+--   expensive_books;
+-- DROP TABLE expensive_books;
+--
+-- 6.2 Создай таблицу author_stats с колонками:
+--     author, book_count, total_amount, avg_price
+-- Expected: CREATE TABLE AS SELECT with aggregate functions
+-- CREATE TABLE author_stats AS
+-- SELECT
+--   author,
+--   COUNT(title) AS book_count,
+--   SUM(amount) AS total_amount,
+--   AVG(price) AS avg_price
+-- FROM
+--   book
+-- GROUP BY
+--   author;
+-- SELECT
+--   *
+-- FROM
+--   author_stats;
+-- DROP TABLE author_stats;
+--
+-- 6.3 Создай таблицу discount_books с книгами, которые дороже средней цены,
+--     добавив колонку new_price со скидкой 15%
+-- Expected: CREATE TABLE AS SELECT with subquery and calculation
+-- CREATE TABLE discount_books AS
+-- SELECT
+--   *,
+--   price * 0.85 AS new_price
+-- FROM
+--   book
+-- WHERE
+--   price > (
+--     SELECT
+--       AVG(price)
+--     FROM
+--       book
+--   );
+-- SELECT
+--   *
+-- FROM
+--   discount_books;
+-- DROP TABLE discount_books;
+--
+-- ============================================
+-- FINAL CHALLENGE: Комплексные задачи
+-- ============================================
+-- F.1 Найди авторов, все книги которых стоят дороже 500 рублей
+-- Hint: MIN(price) для автора должна быть > 500
+-- SELECT
+--   author,
+--   MIN(price) AS min_price
+-- FROM
+--   book
+-- GROUP BY
+--   author
+-- HAVING
+--   MIN(price) > 500;
+--
+-- F.2 Выведи книги, цена которых отличается от средней цены
+--     их автора не более чем на 100 рублей
+-- Hint: Нужен подзапрос со средней ценой по автору
+-- SELECT
+--   title
+-- FROM
+--   book b1
+-- WHERE
+--   ABS(
+--     b1.price - (
+--       SELECT
+--         AVG(b2.price)
+--       FROM
+--         book b2
+--       WHERE
+--         b2.author = b1.author
+--     )
+--   ) < 100;
+--
+-- F.3 Добавь в таблицу book книги из supply, которых еще нет в book
+--     (сравнивай по title И author)
+-- Expected: INSERT INTO ... SELECT with NOT IN or NOT EXISTS
+-- CREATE TABLE supply (
+--   supply_id INT PRIMARY KEY AUTO_INCREMENT,
+--   title VARCHAR(50),
+--   author VARCHAR(30),
+--   price DECIMAL(8, 2),
+--   amount INT
+-- );
+--
+-- INSERT INTO
+--   supply (title, author, price, amount)
+-- VALUES
+--   ('Лирика', 'Пастернак Б.Л.', 518.99, 2),
+--   ('Черный человек', 'Есенин С.А.', 570.20, 6),
+--   ('Белая гвардия', 'Булгаков М.А.', 540.50, 7),
+--   ('Идиот', 'Достоевский Ф.М.', 360.80, 3);
+--
+-- INSERT INTO
+--   book (title, author, price, amount)
+-- SELECT
+--   title,
+--   author,
+--   price,
+--   amount
+-- FROM
+--   supply
+-- WHERE
+--   (supply.title, supply.author) NOT IN (
+--     SELECT
+--       title,
+--       author
+--     FROM
+--       book
+--   );
+--
+SELECT
+  *
+FROM
+  book;
+
+DROP TABLE book;
+
+-- DROP TABLE supply;
